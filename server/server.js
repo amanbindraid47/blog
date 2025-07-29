@@ -14,7 +14,7 @@ app.use(express.json());
 app.use("/api/users", userRouter);
 app.use("/api/blogs", blogRouter);
 
-app.use("/api", (req, res, next) => {
+app.use("/", (req, res, next) => {
   res.send("hello");
 });
 

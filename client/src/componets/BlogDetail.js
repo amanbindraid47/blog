@@ -27,6 +27,8 @@ const BlogDetail = () => {
       const res = await axios.get(`${config.BASE_URL}/api/blogs/${id}`);
       const data = res.data;
       setBlog(data.blog);
+      console.log(blog);
+      
       setInputs({
         title: data.blog.title || "",
         description: data.blog.description || "",

@@ -51,46 +51,42 @@ const getAllBlogs = async(req,res,next) =>{
 // }
 
 
-const addBlog = async(req,res,next) =>{
+const addBlog = async (req, res, next) => {
+  const { title, desc, img, user } = req.body;
+  const currentDate = new Date();
 
-    const { title , desc , img , user } = req.body;
-
-    const currentDate = new Date();
-
-    let existingUser;
-    try {
-        existingUser = await User.findById(user);
-    } catch (e) {
-        return console.log(e);
-    }
-        if(!existingUser){
-        return res.status(400).json({message: " Unautorized"});
+  try {
+    console.log(user);
+    
+    const existingUser = await User.findById(user);
+    console.log(existingUser);
+    
+    if (!existingUser) {
+      return res.status(400).json({ message: "Unauthorized - User not found" });
     }
 
-
+    
     const blog = new Blog({
-        title ,desc , img , user, date: currentDate
+      title,
+      desc,
+      img,
+      user,
+      date: currentDate
     });
 
-    try {
-      await  blog.save();
-    } catch (e) {
-       return console.log(e);
-    }
+    const savedBlog = await blog.save();
 
-    try {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        await blog.save(session);
-        existingUser.blogs.push(blog);
-        await existingUser.save(session);
-        session.commitTransaction();
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ message: err });
-      }
-    return res.status(200).json({blog});
-}
+    
+    existingUser.blogs.push(savedBlog._id);
+    await existingUser.save();
+
+    return res.status(201).json({ message: "Blog created", blog: savedBlog });
+  } catch (err) {
+    console.error("Error while creating blog:", err);
+    return res.status(500).json({ message: "Server error", error: err });
+  }
+};
+
 
 const updateBlog = async(req,res,next) => {
     const blogId = req.params.id;
@@ -135,6 +131,7 @@ const getById = async (req,res,next) =>{
 const deleteBlog = async (req, res, next) => {
 
     const id = req.params.id;
+    console.log(id);
     
     try {
         const blog = await Blog.findByIdAndDelete(id).populate('user');

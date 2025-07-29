@@ -39,7 +39,7 @@ const signUp = async(req,res,next) =>{
    });
 
    try{
-       user.save();
+       await user.save();
        return res.status(201).json({ user })
    }
    catch(e){console.log(e);}
