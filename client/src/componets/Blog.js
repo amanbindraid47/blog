@@ -15,13 +15,19 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useStyles } from "./utils";
 import config from "../config";
-const Blogs = ({ title, desc, img, user, isUser, id }) => {
+const Blogs = ({ title, desc, img, user, isUser, id , date }) => {
+  console.log(img);
+  console.log(id);
+  
+  
   const classes = useStyles();
   const navigate = useNavigate();
   const handleEdit = () => {
     navigate(`/myBlogs/${id}`);
   };
   const deleteRequest = async () => {
+      console.log("Trying to delete blog with id:", id);
+
     const res = await axios
       .delete(`${config.BASE_URL}/api/blogs/${id}`)
       .catch((err) => console.log(err));
@@ -80,7 +86,15 @@ const Blogs = ({ title, desc, img, user, isUser, id }) => {
             variant="body2"
             color="text.secondary"
           >
-            <b>{user}</b> {": "} {desc}
+            <b>{title}</b> {": "} {desc}
+          </Typography>
+
+          <Typography
+            className={classes.font}
+            variant="body2"
+            color="text.secondary"
+          >
+            <b>Uploaded At </b> {": "} {date}
           </Typography>
         </CardContent>
       </Card>
