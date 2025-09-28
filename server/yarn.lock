@@ -1102,10 +1102,10 @@ destroy@1.2.0:
   resolved "https://registry.npmjs.org/destroy/-/destroy-1.2.0.tgz"
   integrity sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==
 
-dotenv@^16.5.0:
-  version "16.5.0"
-  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.5.0.tgz"
-  integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
+dotenv@^16.6.1:
+  version "16.6.1"
+  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.6.1.tgz"
+  integrity sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -1272,6 +1272,11 @@ hasown@^2.0.0:
   dependencies:
     function-bind "^1.1.2"
 
+helmet@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.npmjs.org/helmet/-/helmet-8.1.0.tgz"
+  integrity sha512-jOiHyAZsmnr8LqoPGmCjYAaiuWwjAPLgY8ZX2XrmHawt99/u1y6RgrZMTeoPfpUbV96HOalYgz1qzkRbw54Pmg==
+
 http-errors@2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/http-errors/-/http-errors-2.0.0.tgz"
@@ -1416,10 +1421,10 @@ mongodb@4.17.2:
     "@aws-sdk/credential-providers" "^3.186.0"
     "@mongodb-js/saslprep" "^1.1.0"
 
-mongoose@^6.3.4:
-  version "6.12.6"
-  resolved "https://registry.npmjs.org/mongoose/-/mongoose-6.12.6.tgz"
-  integrity sha512-VFxDnWj8esgswwplmpQYMT+lYcvuIhl76WDLz/vgp41/FOhBPM/n3GjyztK8R3r2ljsM6kudvKgqLhfcZEih1Q==
+mongoose@^6.13.8:
+  version "6.13.8"
+  resolved "https://registry.npmjs.org/mongoose/-/mongoose-6.13.8.tgz"
+  integrity sha512-JHKco/533CyVrqCbyQsnqMpLn8ZCiKrPDTd2mvo2W7ygIvhygWjX2wj+RPjn6upZZgw0jC6U51RD7kUsyK8NBg==
   dependencies:
     bson "^4.7.2"
     kareem "2.5.1"

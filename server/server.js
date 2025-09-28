@@ -10,12 +10,12 @@ const app = express();
 app.use(cors());
 
 //setting helmet middleware
-app.use(helmet(
-  {
+app.use(
+  helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
-  }
-));
+  })
+);
 
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -28,5 +28,4 @@ app.use("/api", (req, res, next) => {
 });
 
 //define port
-
 app.listen(5001, () => console.log("app started at 5001..."));

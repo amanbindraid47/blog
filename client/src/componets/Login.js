@@ -8,8 +8,8 @@ import config from "../config";
 
 const Login = () => {
   const location = useLocation();
-  const naviagte = useNavigate();
-  const dispath = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isSignupButtonPressed } = location.state || {};
 
   const [inputs, setInputs] = useState({
@@ -18,47 +18,53 @@ const Login = () => {
     password: "",
   });
   const [isSignup, setIsSignup] = useState(isSignupButtonPressed || false);
+
+  useEffect(() => {
+    setIsSignup(isSignupButtonPressed);
+  }, [isSignupButtonPressed]);
+
   const handleChange = (e) => {
     setInputs((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
-  useEffect(() => {
-    setIsSignup(isSignupButtonPressed);
-  }, [isSignupButtonPressed]);
+
   const sendRequest = async (type = "login") => {
-    console.log("inside send req");
-    console.log(`${config.BASE_URL}/api/users/${type}`);
-    const res = await axios
-      .post(`${config.BASE_URL}/api/users/${type}`, {
+    try {
+      const res = await axios.post(`${config.BASE_URL}/api/users/${type}`, {
         name: inputs.name,
         email: inputs.email,
         password: inputs.password,
-      })
-      .catch((err) => console.log(err));
-
-    const data = await res.data;
-    console.log("return");
-    console.log(data);
-    return data;
+      });
+      return res.data;
+    } catch (err) {
+      console.error("Error in request:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Invalid credentials or server error");
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(inputs);
     if (isSignup) {
-      sendRequest("signup")
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+      sendRequest("signup").then((data) => {
+        if (data?.user?._id) {
+          localStorage.setItem("userId", data.user._id);
+          dispatch(authActions.login());
+          navigate("/blogs");
+        }
+      });
     } else {
-      sendRequest()
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+      sendRequest("login").then((data) => {
+        if (data?.user?._id) {
+          localStorage.setItem("userId", data.user._id);
+          dispatch(authActions.login());
+          navigate("/blogs");
+        }
+      });
     }
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -85,7 +91,7 @@ const Login = () => {
               placeholder="Name"
               margin="normal"
             />
-          )}{" "}
+          )}
           <TextField
             name="email"
             onChange={handleChange}

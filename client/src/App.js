@@ -28,6 +28,7 @@ function App() {
     </header>
     <main>
     <Routes>
+    <Route path="/" element={<Blogs />} />
       <Route path="/login" element={<Login/>}></Route>
       <Route path="/blogs" element={<Blogs/>}></Route>
       <Route path="/myBlogs" element={<UserBlogs/>}></Route>
