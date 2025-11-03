@@ -37,10 +37,10 @@ const Login = () => {
         password: inputs.password,
       })
       .catch((err) => console.log(err));
-
+    console.log(res)
     const data = await res.data;
-    console.log("return");
-    console.log(data);
+    console.log(data.user._id)
+    console.log(data.data);
     return data;
   };
 

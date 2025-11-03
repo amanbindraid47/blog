@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 const Blog = require("../model/Blog");
 const User = require("../model/User");
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ApiError } = require("../utils/ApiError");
+const ApiResponse = require("../utils/ApiResponse");
+const ApiError = require("../utils/ApiError");
 
 const getAllBlogs = async (req, res, next) => {
   try {
+    console.log("Hello")
     const blogs = await Blog.find();
+    console.log("Blogs", blogs);
     if (!blogs || blogs.length === 0) {
       return res.status(404).json(new ApiError(404, "No blogs found"));
     }
@@ -17,7 +19,9 @@ const getAllBlogs = async (req, res, next) => {
 };
 
 const addBlog = async (req, res, next) => {
+  console.log("Inside add blog");
   const { title, desc, img, user } = req.body;
+  console.log(req.body)
   const currentDate = new Date();
 
   try {
@@ -26,17 +30,15 @@ const addBlog = async (req, res, next) => {
       return res.status(400).json(new ApiError(400, "Unauthorized"));
     }
 
-    const blog = new Blog({ title, desc, img, user, date: currentDate });
+    const blog = await Blog.create({ title, desc, img, user, date: currentDate });
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    await blog.save({ session });
-    existingUser.blogs.push(blog);
-    await existingUser.save({ session });
-    await session.commitTransaction();
+    existingUser.blogs.push(blog._id);
+    await existingUser.save();
+
 
     return res.status(201).json(new ApiResponse(201, { blog }, "Blog created successfully"));
   } catch (e) {
+    console.log("error", e)
     return res.status(500).json(new ApiError(500, e.message));
   }
 };

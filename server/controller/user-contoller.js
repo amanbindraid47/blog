@@ -1,7 +1,7 @@
 const User = require("../model/User");
 const bcrypt = require("bcryptjs");
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ApiError } = require("../utils/ApiError");
+const ApiResponse  = require("../utils/ApiResponse");
+const ApiError  = require("../utils/ApiError");
 
 const getAllUser = async (req, res, next) => {
     try {
@@ -21,6 +21,7 @@ const signUp = async (req, res, next) => {
 
     try {
         const existingUser = await User.findOne({ email });
+        console.log(existingUser)
         if (existingUser) {
             return res.status(400).json(new ApiError(400, "User already exists"));
         }
@@ -32,8 +33,10 @@ const signUp = async (req, res, next) => {
             password: hashedPassword,
             blogs: []
         });
+        console.log(user)
 
         await user.save();
+        console.log("User saved")
         return res.status(201).json(new ApiResponse(201, { user }, "User registered successfully"));
     } catch (e) {
         console.error(e);
@@ -43,9 +46,10 @@ const signUp = async (req, res, next) => {
 
 const logIn = async (req, res, next) => {
     const { email, password } = req.body;
-
+    console.log(email)
     try {
         const existingUser = await User.findOne({ email });
+        console.log("Exisiting")
         if (!existingUser) {
             return res.status(404).json(new ApiError(404, "User not found"));
         }

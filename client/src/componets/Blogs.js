@@ -5,15 +5,17 @@ import config from "../config";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState();
+  console.log("hi")
   const sendRequest = async () => {
     const res = await axios
       .get(`${config.BASE_URL}/api/blogs`)
       .catch((err) => console.log(err));
     const data = await res.data;
+    console.log(data.data.blogs)
     return data;
   };
   useEffect(() => {
-    sendRequest().then((data) => setBlogs(data.blogs));
+    sendRequest().then((data) => setBlogs(data.data.blogs));
   }, []);
   console.log(blogs);
   return (
