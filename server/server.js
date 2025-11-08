@@ -7,26 +7,27 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "DELETE", "PATCH", "PUT"],
+  credentials: true,
+}));
 
-//setting helmet middleware
-app.use(helmet(
-  {
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-  }
-));
+// ✅ Use only express.json() — it replaces bodyParser.json()
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // for form data
+
+// ✅ Helmet middleware
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
 
 app.set("view engine", "ejs");
-app.use(express.json());
 
+// ✅ Routes
 app.use("/api/users", userRouter);
 app.use("/api/blogs", blogRouter);
 
-app.use("/api", (req, res, next) => {
-  res.send("hello");
-});
-
-//define port
-
+// ✅ Start server
 app.listen(5001, () => console.log("app started at 5001..."));

@@ -8,8 +8,8 @@ import config from "../config";
 
 const Login = () => {
   const location = useLocation();
-  const naviagte = useNavigate();
-  const dispath = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isSignupButtonPressed } = location.state || {};
 
   const [inputs, setInputs] = useState({
@@ -27,38 +27,54 @@ const Login = () => {
   useEffect(() => {
     setIsSignup(isSignupButtonPressed);
   }, [isSignupButtonPressed]);
-  const sendRequest = async (type = "login") => {
-    console.log("inside send req");
-    console.log(`${config.BASE_URL}/api/users/${type}`);
-    const res = await axios
-      .post(`${config.BASE_URL}/api/users/${type}`, {
-        name: inputs.name,
+
+
+const sendRequest = async (type = "login") => {
+  try {
+    const res = await fetch(`${config.BASE_URL}/api/users/${type}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         email: inputs.email,
         password: inputs.password,
-      })
-      .catch((err) => console.log(err));
+        name: inputs.name,
+      }),
+    });
 
-    const data = await res.data;
-    console.log("return");
-    console.log(data);
-    return data;
-  };
+    const data = await res.json();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(inputs);
-    if (isSignup) {
-      sendRequest("signup")
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+    if(data.success === true) {
+      alert(data.message)
     } else {
-      sendRequest()
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+      alert("Wrong Email or password")
     }
-  };
+
+    console.log(data)
+
+    return data;
+  } catch (err) {
+    console.error("Request error:", err);
+  }
+};
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  const type = isSignup ? "signup" : "login";
+  const data = await sendRequest(type);
+
+  if (data?.user?._id) {
+    localStorage.setItem("userId", data.user._id);
+    dispatch(authActions.login());
+    navigate("/blogs");
+  } else {
+
+  }
+};
+
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
