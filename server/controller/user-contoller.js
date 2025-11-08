@@ -41,16 +41,20 @@ const signUp = async (req, res, next) => {
     }
 };
 
-const logIn = async (req, res, next) => {
+const logIn = async (req, res) => {
     const { email, password } = req.body;
+
+    if(!email || !password) {
+        return res.status(404).json(new ApiError(404, "All fields are required"));
+    }
 
     try {
         const existingUser = await User.findOne({ email });
         if (!existingUser) {
-            return res.status(404).json(new ApiError(404, "User not found"));
+            return res.status(404).json(new ApiError({statusCode: 404}, {message: 'User not found'}));
         }
 
-        const isPasswordCorrect = bcrypt.compareSync(password, existingUser.password);
+        const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
         if (!isPasswordCorrect) {
             return res.status(400).json(new ApiError(400, "Incorrect Password"));
         }
