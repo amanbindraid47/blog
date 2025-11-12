@@ -1,17 +1,16 @@
-const mongoose = require("mongoose");
-const Blog = require("../model/Blog");
-const User = require("../model/User");
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ApiError } = require("../utils/ApiError");
+import mongoose from "mongoose";
+import Blog from "../model/Blog.js";
+import User from "../model/User.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const getAllBlogs = async (req, res, next) => {
   try {
-    const blogs = await Blog.find();
-    if (!blogs || blogs.length === 0) {
-      return res.status(404).json(new ApiError(404, "No blogs found"));
-    }
+    const blogs = await Blog.find().populate("user");
+    console.log("getAllBlogs - Found blogs:", blogs.length);
     return res.status(200).json(new ApiResponse(200, { blogs }, "Blogs found"));
   } catch (e) {
+    console.error("Error in getAllBlogs:", e);
     return res.status(500).json(new ApiError(500, e.message));
   }
 };
@@ -21,22 +20,27 @@ const addBlog = async (req, res, next) => {
   const currentDate = new Date();
 
   try {
+    console.log("Adding blog with data:", { title, desc, img, user });
+    
     const existingUser = await User.findById(user);
     if (!existingUser) {
+      console.log("User not found:", user);
       return res.status(400).json(new ApiError(400, "Unauthorized"));
     }
 
     const blog = new Blog({ title, desc, img, user, date: currentDate });
+    
+    // Save blog first
+    await blog.save();
+    
+    // Then update user with blog reference
+    existingUser.blogs.push(blog._id);
+    await existingUser.save();
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    await blog.save({ session });
-    existingUser.blogs.push(blog);
-    await existingUser.save({ session });
-    await session.commitTransaction();
-
+    console.log("Blog created successfully:", blog);
     return res.status(201).json(new ApiResponse(201, { blog }, "Blog created successfully"));
   } catch (e) {
+    console.error("Error in addBlog:", e);
     return res.status(500).json(new ApiError(500, e.message));
   }
 };
@@ -59,7 +63,7 @@ const updateBlog = async (req, res, next) => {
 const getById = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findById(id).populate("user");
     if (!blog) {
       return res.status(404).json(new ApiError(404, "Blog not found"));
     }
@@ -90,14 +94,18 @@ const deleteBlog = async (req, res, next) => {
 const getByUserId = async (req, res, next) => {
   const userId = req.params.id;
   try {
+    console.log("getByUserId - Getting blogs for user:", userId);
     const userBlogs = await User.findById(userId).populate("blogs");
     if (!userBlogs) {
-      return res.status(404).json(new ApiError(404, "No blog found for this user"));
+      console.log("User not found:", userId);
+      return res.status(404).json(new ApiError(404, "User not found"));
     }
+    console.log("getByUserId - Found user with", userBlogs.blogs?.length || 0, "blogs");
     return res.status(200).json(new ApiResponse(200, { user: userBlogs }, "Blogs retrieved successfully"));
   } catch (e) {
+    console.error("Error in getByUserId:", e);
     return res.status(500).json(new ApiError(500, e.message));
   }
 };
 
-module.exports = { getAllBlogs, addBlog, updateBlog, getById, deleteBlog, getByUserId };
+export { getAllBlogs, addBlog, updateBlog, getById, deleteBlog, getByUserId };
