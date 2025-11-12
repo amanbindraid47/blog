@@ -1,7 +1,7 @@
-const User = require("../model/User");
-const bcrypt = require("bcryptjs");
-const { ApiResponse } = require("../utils/ApiResponse");
-const { ApiError } = require("../utils/ApiError");
+import User from "../model/User.js";
+import bcrypt from "bcryptjs";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const getAllUser = async (req, res, next) => {
     try {
@@ -62,4 +62,4 @@ const logIn = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllUser, signUp, logIn };
+export { getAllUser, signUp, logIn };

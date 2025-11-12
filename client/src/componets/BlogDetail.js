@@ -25,11 +25,12 @@ const BlogDetail = () => {
   const fetchDetails = useCallback(async () => {
     try {
       const res = await axios.get(`${config.BASE_URL}/api/blogs/${id}`);
-      const data = res.data;
-      setBlog(data.blog);
+      const apiResponse = res.data;
+      const blog = apiResponse.data?.blog;
+      setBlog(blog);
       setInputs({
-        title: data.blog.title || "",
-        description: data.blog.description || "",
+        title: blog?.title || "",
+        description: blog?.desc || "",
       });
     } catch (err) {
       console.error("Failed to fetch blog details:", err);

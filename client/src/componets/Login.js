@@ -1,123 +1,126 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../store";
 import { useNavigate, useLocation } from "react-router-dom";
 import config from "../config";
 
 const Login = () => {
   const location = useLocation();
-  const naviagte = useNavigate();
-  const dispath = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { isSignupButtonPressed } = location.state || {};
+  const isDark = useSelector((state) => state.theme.isDarkmode);
 
-  const [inputs, setInputs] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
+  const [inputs, setInputs] = useState({ name: "", email: "", password: "" });
   const [isSignup, setIsSignup] = useState(isSignupButtonPressed || false);
-  const handleChange = (e) => {
-    setInputs((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
+
   useEffect(() => {
-    setIsSignup(isSignupButtonPressed);
+    setIsSignup(!!isSignupButtonPressed);
   }, [isSignupButtonPressed]);
+
+  const handleChange = (e) => {
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
   const sendRequest = async (type = "login") => {
-    console.log("inside send req");
-    console.log(`${config.BASE_URL}/api/users/${type}`);
-    const res = await axios
-      .post(`${config.BASE_URL}/api/users/${type}`, {
+    try {
+      const res = await axios.post(`${config.BASE_URL}/api/users/${type}`, {
         name: inputs.name,
         email: inputs.email,
         password: inputs.password,
-      })
-      .catch((err) => console.log(err));
-
-    const data = await res.data;
-    console.log("return");
-    console.log(data);
-    return data;
+      });
+      return res.data;
+    } catch (err) {
+      console.error("Error in sendRequest:", err);
+      throw err;
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(inputs);
     if (isSignup) {
       sendRequest("signup")
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+        .then((data) => {
+          localStorage.setItem("userId", data.data.user._id);
+          dispatch(authActions.login());
+          navigate("/blogs");
+        })
+        .catch((err) => alert("Signup failed: " + (err.response?.data?.message || err.message)));
     } else {
       sendRequest()
-        .then((data) => localStorage.setItem("userId", data.user._id))
-        .then(() => dispath(authActions.login()))
-        .then(() => naviagte("/blogs"));
+        .then((data) => {
+          localStorage.setItem("userId", data.data.user._id);
+          dispatch(authActions.login());
+          navigate("/blogs");
+        })
+        .catch((err) => alert("Login failed: " + (err.response?.data?.message || err.message)));
     }
   };
+
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <Box
-          maxWidth={400}
-          display="flex"
-          flexDirection={"column"}
-          alignItems="center"
-          justifyContent={"center"}
-          boxShadow="10px 10px 20px #ccc"
-          padding={3}
-          margin="auto"
-          marginTop={5}
-          borderRadius={5}
-        >
-          <Typography variant="h2" padding={3} textAlign="center">
-            {isSignup ? "Signup" : "Login"}
-          </Typography>
-          {isSignup && (
-            <TextField
-              name="name"
-              onChange={handleChange}
-              value={inputs.name}
-              placeholder="Name"
-              margin="normal"
-            />
-          )}{" "}
-          <TextField
-            name="email"
-            onChange={handleChange}
-            value={inputs.email}
-            type={"email"}
-            placeholder="Email"
-            margin="normal"
-          />
-          <TextField
-            name="password"
-            onChange={handleChange}
-            value={inputs.password}
-            type={"password"}
-            placeholder="Password"
-            margin="normal"
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{ borderRadius: 3, marginTop: 3 }}
-            color="warning"
-          >
-            Submit
-          </Button>
-          <Button
-            onClick={() => setIsSignup(!isSignup)}
-            sx={{ borderRadius: 3, marginTop: 3 }}
-          >
-            Change To {isSignup ? "Login" : "Signup"}
-          </Button>
-        </Box>
-      </form>
+    <div className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 ${isDark ? 'bg-transparent' : ''}`}>
+      <div className="max-w-md mx-auto">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-[#071025] shadow-xl rounded-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 sm:p-10">
+            <h2 className="text-2xl sm:text-3xl font-bold">{isSignup ? 'Create account' : 'Welcome back'}</h2>
+            <p className="text-sm text-white/90 mt-1">{isSignup ? 'Fill the details to create a new account.' : 'Login to continue to BlogsApp.'}</p>
+          </div>
+
+          <div className="p-8 sm:p-10 space-y-6">
+            {isSignup && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                <input
+                  name="name"
+                  onChange={handleChange}
+                  value={inputs.name}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+            )}
+
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <input
+                  name="email"
+                  onChange={handleChange}
+                  value={inputs.email}
+                  type="email"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+              <input
+                name="password"
+                onChange={handleChange}
+                value={inputs.password}
+                type="password"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+
+
+            <div className="flex items-center justify-between gap-4">
+              <button type="submit" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow hover:scale-[1.02] transition-transform">
+                {isSignup ? 'Sign up' : 'Sign in'}
+              </button>
+
+              <button type="button" onClick={() => setIsSignup(!isSignup)} className="text-sm text-gray-600 dark:text-gray-300 underline">
+                {isSignup ? 'Have an account? Sign in' : "Don't have an account? Sign up"}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
