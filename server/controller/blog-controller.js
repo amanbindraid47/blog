@@ -8,7 +8,7 @@ const getAllBlogs = async (req, res, next) => {
   try {
     const blogs = await Blog.find();
     if (!blogs || blogs.length === 0) {
-      return res.status(404).json(new ApiError(404, "dNodd blogs found"));
+      return res.status(404).json(new ApiError(404, "dNodd dblogs foddund"));
     }
     return res.status(200).json(new ApiResponse(200, { blogs }, "Blogs found"));
   } catch (e) {
