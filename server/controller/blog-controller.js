@@ -8,7 +8,7 @@ const getAllBlogs = async (req, res, next) => {
   try {
     const blogs = await Blog.find();
     if (!blogs || blogs.length === 0) {
-      return res.status(404).json(new ApiError(404, "No blogs found"));
+      return res.status(404).json(new ApiError(404, "Nodd blogs found"));
     }
     return res.status(200).json(new ApiResponse(200, { blogs }, "Blogs found"));
   } catch (e) {
@@ -61,7 +61,7 @@ const getById = async (req, res, next) => {
   try {
     const blog = await Blog.findById(id);
     if (!blog) {
-      return res.status(404).json(new ApiError(404, "Blog not found in api"));
+      return res.status(404).json(new ApiError(404, "Blog not found in apihttps://github.com/amanbindraid47/blog.git"));
     }
     return res.status(200).json(new ApiResponse(200, { blog }, "Blog retrieved successfully"));
   } catch (e) {
